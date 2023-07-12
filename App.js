@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
-import { Text } from 'react-native';
+import { Modal, Text } from 'react-native';
 import { View, TouchableOpacity, StyleSheet, PanResponder } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import ColorPopUp from './colorPopUp';
+import StrokePopUp from './strokePopUp';
+
+let colors = ["#000"];
+let strokes = [5]
+
 export default function PaintApp() {
   const [paths, setPaths] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [strokes, setStrokes] = useState([]);
   const [currentPath, setCurrentPath] = useState("");
-
   const [chooseColor, setChooseColor] = useState("#000");
   const [chooseStroke, setChooseStroke] = useState(5);
+
+  const [visibleColorPopUp, setVisibleColorPopUp] = useState(false);
+  const [visibleStrokePopUp, setVisibleStrokePopUp] = useState(false);
+
 
   const handlePanResponderGrant = ({ nativeEvent }) => {
     const { locationX, locationY } = nativeEvent;
     const newPath = `M${locationX},${locationY}`;
     setCurrentPath(newPath);
     setPaths((prevPaths) => [...prevPaths, newPath]);
+    colors.push(chooseColor);
+    strokes.push(chooseStroke);
   };
 
   const handlePanResponderMove = ({ nativeEvent }) => {
@@ -25,9 +34,9 @@ export default function PaintApp() {
 
     const { locationX, locationY } = nativeEvent;
     const updatedPath = `${currentPath} L${locationX},${locationY}`;
+
     setCurrentPath(updatedPath);
-    setColors((prevColors) => [...prevColors, chooseColor]);
-    setStrokes((prevStrokes) => [...prevStrokes, chooseStroke]);
+
     setPaths((prevPaths) => {
       const updatedPaths = [...prevPaths];
       updatedPaths[updatedPaths.length - 1] = updatedPath;
@@ -42,25 +51,9 @@ export default function PaintApp() {
   const handleClear = () => {
     setPaths([]);
     setCurrentPath('');
+    colors = [];
+    strokes = [];
   };
-
-  const handleColor = () => {
-    if (chooseColor == "#000") {
-      setChooseColor((prevChooseColor) => prevChooseColor = "#FF6101")
-    }
-    else {
-      setChooseColor((prevChooseColor) => prevChooseColor = "#000")
-    }
-  }
-
-  const handleStroke = () => {
-    if (chooseStroke == 5) {
-      setChooseStroke((setChooseStroke) => setChooseStroke = 20)
-    }
-    else {
-      setChooseStroke((setChooseStroke) => setChooseStroke = 5);
-    }
-  }
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -71,25 +64,35 @@ export default function PaintApp() {
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
+
+      <Modal visible={visibleColorPopUp} transparent={true} animationType={"slide"}>
+        <ColorPopUp chooseColor={chooseColor} setChooseColor={setChooseColor} setVisibleColorPopUp={setVisibleColorPopUp} />
+      </Modal>
+
+      <Modal visible={visibleStrokePopUp} transparent={true} animationType={"slide"}>
+        <StrokePopUp chooseColor={chooseStroke} setChooseStroke={setChooseStroke} setVisibleStrokePopUp={setVisibleStrokePopUp} />
+      </Modal>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleClear}>
+          <Text style={styles.buttonText}>Clear All</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={() => { setVisibleColorPopUp(true) }}>
+          <Text style={styles.buttonText}>Colors</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={() => { setVisibleStrokePopUp(true) }}>
+          <Text style={styles.buttonText}>Stroke</Text>
+        </TouchableOpacity>
+      </View>
+
       <Svg style={styles.canvas}>
         {paths.map((path, index) => (
           <Path key={index} d={path} stroke={colors[index]} strokeWidth={strokes[index]} fill="none" />
         ))}
       </Svg>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, { backgroundColor: chooseColor }]} onPress={handleClear}>
-          <Text style={styles.buttonText}>Clear All</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.button, { backgroundColor: chooseColor }]} onPress={handleColor}>
-          <Text style={styles.buttonText}>Colors</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.button, { backgroundColor: chooseColor }]} onPress={handleStroke}>
-          <Text style={styles.buttonText}>Stroke</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </View >
   );
 }
 
@@ -107,13 +110,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-around",
-    paddingBottom: 20,
+    paddingTop: 40,
   },
   button: {
     padding: 10,
     borderRadius: 20,
     alignItems: 'center',
     width: "28%",
+    backgroundColor: "#000",
   },
   buttonText: {
     color: '#fff',
