@@ -7,9 +7,9 @@ const ColorPopUp = ({ chooseStroke, setChooseStroke, setVisibleStrokePopUp }) =>
             <View style={styles.wrapper}>
                 <Text>Slide Stroke</Text>
 
-                <Image source={require("./assets/favicon.png")} style={{ width: 200, heigth: 200 }} />
+                <Image source={require("../assets/favicon.png")} style={{ width: 200, aspectRatio: 1 }} />
 
-                <TextInput value={chooseStroke} onChangeText={(chooseStroke) => { setChooseStroke((prevSetChooseStroke) => prevSetChooseStroke = chooseStroke) }} />
+                <TextInput value={chooseStroke} onChangeText={(chooseStroke) => { setChooseStroke(chooseStroke) }} />
 
                 <TouchableOpacity onPress={() => { setVisibleStrokePopUp(false) }}>
                     <Text>Okay</Text>

@@ -7,9 +7,9 @@ const ColorPopUp = ({ chooseColor, setChooseColor, setVisibleColorPopUp }) => {
             <View style={styles.wrapper}>
                 <Text>Choose Color</Text>
 
-                <Image source={require("./assets/favicon.png")} style={{ width: 200, heigth: 200 }} />
+                <Image source={require("../assets/favicon.png")} style={{ width: 200, aspectRatio: 1 }} />
 
-                <TextInput value={chooseColor} onChangeText={(chooseColor) => { setChooseColor((prevSetChooseColor) => prevSetChooseColor = chooseColor) }} />
+                <TextInput value={chooseColor} onChangeText={(chooseColor) => { setChooseColor(chooseColor) }} />
 
                 <TouchableOpacity onPress={() => { setVisibleColorPopUp(false) }}>
                     <Text>Okay</Text>
